@@ -503,6 +503,123 @@ meddiff_fit <- function(m) {
   return(result)
 }
 
+#' Save history
+#'
+#' If a "history.csv" file exists, adds the eight-number summary and module
+#' effect to that file, one row per module.
+#' If "history.csv" does not exist, creates the file first.
+#'
+#' history.csv must have the following columns:
+#'
+#' - Year
+#' - Module
+#' - (N)
+#' - Zeros
+#' - Min.
+#' - 1st Qu.
+#' - Median
+#' - 3rd Qu.
+#' - Max.
+#' - Mean,
+#' - S.D.
+#'
+#' @param year The year
+#'
+#' @examples
+#' \dontrun{
+#' norman::save_history(2025)
+#' }
+#'
+save_history <- function(year) {
+  # create history.csv if it doesn't exist
+
+  history_colnames <- c(
+    "Year",
+    "Module",
+    "(N)",
+    "Zeros",
+    "Min.",
+    "1st Qu.",
+    "Median",
+    "3rd Qu.",
+    "Max.",
+    "Mean",
+    "S.D.",
+    "Effect"
+  )
+  if (!file.exists("history.csv")) {
+    history <- data.frame(matrix(ncol = 12, nrow = 0))
+    colnames(history) <- history_colnames
+    readr::write_csv(history, "history.csv")
+  }
+
+  # read and check colnames of "history"
+  history_csv_colnames <- colnames(
+    readr::read_csv("history.csv", n_max = 0, show_col_type = FALSE)
+  )
+  if (!identical(history_csv_colnames, history_colnames)) {
+    stop("`'history.csv'` does not have expected column names.")
+  }
+
+  ## Run the code from `report_body_material` (chunk names)
+  # Get filesnames (adapted from print_file_listing without the printing)
+  filenames <- list.files(path = "marks", pattern = "*.csv")
+
+  # read_in_the_marks
+  module_codes <- unlist(substr(filenames, 1, 5))
+  module_marks <- vector(mode = "list", length = length(module_codes))
+  for (i in seq(along = filenames)) {
+    module_marks[[module_codes[i]]] <-
+      utils::read.csv(
+        paste0("marks/", filenames[i]),
+        stringsAsFactors = TRUE
+      )[, c("sprCode", "overallMark")]
+  }
+  student_IDs <- sapply(module_marks, function(m) as.character(m[[1]]))
+  module_marks <- sapply(module_marks, function(m) (m[[2]]))
+  unique_student_IDs <- sort(unique(unlist(student_IDs)))
+  marks_matrix <- matrix(NA, length(unique_student_IDs), length(module_codes))
+  rownames(marks_matrix) <- unique_student_IDs
+  colnames(marks_matrix) <- module_codes
+  for (m in module_codes) {
+    marks_matrix[student_IDs[[m]], m] <- module_marks[[m]]
+  }
+
+  # create the eight-number summaries
+  summaries <- raw_mark_summaries(marks_matrix)
+
+  ## create the module effects
+  # compute_median_differences
+  md <- norman::meddiff(marks_matrix) ## used as input to meddiff_fit()
+  mdd <- norman::meddiff_for_display(marks_matrix)
+  ## the latter is used only for the full listing of differences below
+  mdfit <- norman::meddiff_fit(md)
+  rsq <- summary(mdfit)$r.squared
+
+  # get_module_effects
+  # this is taken from code within `get_module_effects`, up to preparing `mdf` for printing
+  # NOTE: probably want to extract into separate function to avoid code repetion
+  count <- numeric(length(mdd))
+  names(count) <- names(mdd)
+  for (i in names(mdd)) {
+    count[i] <- sum(mdd[[i]][2, ])
+  }
+  mdfit <- mdfit$coef
+  names(mdfit) <- module_codes
+  #weighted_mean <- sum(mdfit * count) / sum(count)
+  #mdfit <- round(mdfit - weighted_mean, 1)
+  mdfit <- round(mdfit - median(mdfit), 1)
+  mdf <- data.frame(Effect = mdfit)
+
+  # combine
+  latest_history <- dplyr::bind_cols(year, summaries, mdf)
+
+  # append the data to the csv
+  readr::write_csv(latest_history, "history.csv", append = TRUE)
+
+  latest_history
+}
+
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
 #'
 #' @param build_opts Character; options for \code{R CMD build}.  Default is \code{"--no-build-vignettes"}.
