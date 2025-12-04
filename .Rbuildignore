@@ -6,4 +6,5 @@ docs
 ^doc$
 ^Meta$
 .travis.yml
+CLAUDE.md
 
