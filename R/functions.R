@@ -621,7 +621,7 @@ save_history <- function(year) {
   )
 
   # Add latest history to previous history
-  history <- dplyr::bind_rows(history, latest_history)
+  history <- rbind(history, latest_history)
   history <- unique(history)
 
   # append the data to the csv
