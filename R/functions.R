@@ -554,10 +554,8 @@ save_history <- function(year) {
   }
 
   # read and check colnames of "history"
-  history_csv_colnames <- colnames(
-    readr::read_csv("history.csv", n_max = 0, show_col_type = FALSE)
-  )
-  if (!identical(history_csv_colnames, history_colnames)) {
+  history <- readr::read_csv("history.csv", show_col_type = FALSE)
+  if (!identical(colnames(history), history_colnames)) {
     stop("`'history.csv'` does not have expected column names.")
   }
 
@@ -622,8 +620,12 @@ save_history <- function(year) {
     mdf
   )
 
+  # Add latest history to previous history
+  history <- dplyr::bind_rows(history, latest_history)
+  history <- unique(history)
+
   # append the data to the csv
-  readr::write_csv(latest_history, "history.csv", append = TRUE)
+  readr::write_csv(latest_history, "history.csv")
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
