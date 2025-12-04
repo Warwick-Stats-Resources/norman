@@ -529,7 +529,7 @@ meddiff_fit <- function(m) {
 #' \dontrun{
 #' norman::save_history(2025)
 #' }
-#'
+#' @export
 save_history <- function(year) {
   # create history.csv if it doesn't exist
 
