@@ -2,8 +2,7 @@
 
 \thispagestyle{mylandscape}
 
-
-## module-code module-name
+## module-code module-name history
 
 \vspace{-0.2in}
 
@@ -37,20 +36,6 @@ knitr::kable(summaries["module-code",,drop = FALSE])
 
 ```{r classes-module-code}
 knitr::kable(classes["module-code (%)",,drop = FALSE])
-```
-
-```{r}
-## WILL NEED THIS TO BE IF HISTORY EXISTS FOR THIS MODULE!
-history_exists <- file.exists("history.csv")
-```
-
-```{r, results='asis'}
-if (!history_exists) {
-  cat("There is no history for this module")
-}
-```
-
-```{r child=if(history_exists) 'module_history_template.Rmd'}
 ```
 
 \vfill
