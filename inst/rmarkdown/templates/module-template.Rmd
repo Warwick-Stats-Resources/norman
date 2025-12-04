@@ -41,7 +41,7 @@ knitr::kable(classes["module-code (%)",,drop = FALSE])
 
 ```{r}
 ## WILL NEED THIS TO BE IF HISTORY EXISTS FOR THIS MODULE!
-history_exists <- file.exists("history.csv")
+history_exists <- file.exists("../history.csv")
 ```
 
 ```{r, results='asis'}
