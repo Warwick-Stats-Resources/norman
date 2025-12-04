@@ -50,7 +50,7 @@ if (!history_exists) {
 }
 ```
 
-```{r child=if(history_exists) 'module_history_template.Rmd'}
+```{r child=if(history_exists) 'module-history-template.Rmd'}
 ```
 
 \vfill
