@@ -605,19 +605,25 @@ save_history <- function(year) {
     count[i] <- sum(mdd[[i]][2, ])
   }
   mdfit <- mdfit$coef
-  names(mdfit) <- module_codes
+  #names(mdfit) <- module_codes
   #weighted_mean <- sum(mdfit * count) / sum(count)
   #mdfit <- round(mdfit - weighted_mean, 1)
   mdfit <- round(mdfit - median(mdfit), 1)
   mdf <- data.frame(Effect = mdfit)
 
+  row.names(summaries) <- NULL
+  row.names(mdf) <- NULL
+
   # combine
-  latest_history <- dplyr::bind_cols(year, summaries, mdf)
+  latest_history <- dplyr::bind_cols(
+    Year = year,
+    Module = module_codes,
+    summaries,
+    mdf
+  )
 
   # append the data to the csv
   readr::write_csv(latest_history, "history.csv", append = TRUE)
-
-  latest_history
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
