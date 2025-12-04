@@ -39,11 +39,12 @@ knitr::kable(summaries["module-code",,drop = FALSE])
 knitr::kable(classes["module-code (%)",,drop = FALSE])
 ```
 
-
-
-
-
 \vfill
+
+\newpage
+
+Let's print some history here!
+
 \elandscape
 \newpage
 
