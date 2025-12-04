@@ -622,9 +622,11 @@ save_history <- function(year) {
 
   # Add latest history to previous history
   history <- rbind(history, latest_history)
+
+  # MAYBE: add message if history != unique(history)
   history <- unique(history)
 
-  # append the data to the csv
+  # rewrite the csv
   readr::write_csv(history, "history.csv")
 }
 
