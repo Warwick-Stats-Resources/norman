@@ -27,7 +27,7 @@ cat(stemplot, sep = "\n")
 \large
 \setlength{\LTleft}{1em}
 
-**Seven-number summary:**
+**Eight-number summary:**
 
 ```{r sevennum-module-code}
 knitr::kable(summaries["module-code",,drop = FALSE])

@@ -260,11 +260,12 @@ scatter <- function(module_code, marks_matrix, student_overall_median) {
 #' @export
 raw_mark_summaries <- function(marks_matrix) {
   M <- ncol(marks_matrix)
-  result <- matrix(NA, M, 8)
+  result <- matrix(NA, M, 9)
   rownames(result) <- colnames(marks_matrix)
   colnames(result) <- c(
     "(N)",
     "Zeros",
+    "Min.",
     "1st Qu.",
     "Median",
     "3rd Qu.",
@@ -275,6 +276,9 @@ raw_mark_summaries <- function(marks_matrix) {
   result[, "(N)"] <- apply(marks_matrix, 2, function(col) sum(!is.na(col)))
   result[, "Zeros"] <- apply(marks_matrix, 2, function(col) {
     sum(col == 0, na.rm = TRUE)
+  })
+  result[, "Min."] <- apply(marks_matrix, 2, function(col) {
+    min(col, na.rm = TRUE)
   })
   result[, "1st Qu."] <- apply(marks_matrix, 2, function(col) {
     quantile(col, 0.25, na.rm = TRUE)

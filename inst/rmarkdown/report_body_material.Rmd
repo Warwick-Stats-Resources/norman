@@ -75,7 +75,7 @@ Modules that were **found in the marks folder unexpectedly**:
 
 **Overall median mark: `r median(marks_matrix, na.rm = TRUE)`**
 
-## Seven-number summaries
+## Eight-number summaries
 
 ```{r summary_all_modules}
 summaries <- norman::raw_mark_summaries(marks_matrix)
