@@ -625,7 +625,7 @@ save_history <- function(year) {
   history <- unique(history)
 
   # append the data to the csv
-  readr::write_csv(latest_history, "history.csv")
+  readr::write_csv(history, "history.csv")
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
