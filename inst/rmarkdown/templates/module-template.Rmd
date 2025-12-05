@@ -43,6 +43,19 @@ knitr::kable(classes["module-code (%)",,drop = FALSE])
 history_exists <- file.exists("../history.csv")
 ```
 
+```{r eval=history_exists}
+library(dplyr)
+history <- readr::read_csv("../history.csv")
+module_history <- history |> 
+  filter(Module == "module-code")
+
+history_exists <- ifelse(nrow(module_history) > 0, TRUE, FALSE)
+```
+
+```{r, results='asis', eval=!history_exists}
+cat("There is no history for module-code.")
+```
+
 \vfill
 \elandscape
 
@@ -54,8 +67,7 @@ cat("## module-code module-name History\n\n")
 ```
 
 ```{r eval=history_exists}
-history <- readr::read_csv("../history.csv")
-head(history)
+module_history
 ```
 
 ```{r, results='asis', eval=history_exists}
