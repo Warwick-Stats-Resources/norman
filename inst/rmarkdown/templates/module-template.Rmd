@@ -40,21 +40,29 @@ knitr::kable(classes["module-code (%)",,drop = FALSE])
 ```
 
 ```{r}
-## WILL NEED THIS TO BE IF HISTORY EXISTS FOR THIS MODULE!
 history_exists <- file.exists("../history.csv")
-```
-
-```{r, results='asis'}
-if (!history_exists) {
-  cat("There is no history for this module")
-}
-```
-
-```{r child=if(history_exists) 'module-history-template.Rmd'}
 ```
 
 \vfill
 \elandscape
+
+```{r, results='asis', eval=history_exists}
+cat("\\newpage\n\n")
+cat("\\blandscape\n\n")
+cat("\\thispagestyle{mylandscape}\n\n")
+cat("## module-code module-name History\n\n")
+```
+
+```{r eval=history_exists}
+history <- readr::read_csv("../history.csv")
+head(history)
+```
+
+```{r, results='asis', eval=history_exists}
+cat("\\vfill\n")
+cat("\\elandscape\n")
+```
+
 \newpage
 
 

@@ -142,22 +142,6 @@ make_module_pages <- function(
   )
   tmpdir <- file.path(working_directory, "tmp")
   dir.create(tmpdir, showWarnings = FALSE)
-
-  # Copy module-history-template.Rmd to tmpdir so it can be found by child includes
-  history_template_source <- system.file(
-    "rmarkdown",
-    "templates",
-    "module-history-template.Rmd",
-    package = "norman"
-  )
-  if (file.exists(history_template_source)) {
-    file.copy(
-      history_template_source,
-      file.path(tmpdir, "module-history-template.Rmd"),
-      overwrite = TRUE
-    )
-  }
-
   if (!is.null(module_names)) {
     name_known <- row.names(module_names)
   } else {
