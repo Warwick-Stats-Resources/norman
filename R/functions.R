@@ -531,8 +531,10 @@ meddiff_fit <- function(m) {
 #' }
 #' @export
 save_history <- function(year) {
-  # create history.csv if it doesn't exist
+  # Declare global variables to satisfy R CMD check
+  Year <- NULL
 
+  # create history.csv if it doesn't exist
   history_colnames <- c(
     "Year",
     "Module",
@@ -620,14 +622,41 @@ save_history <- function(year) {
     mdf
   )
 
-  # Add latest history to previous history
-  history <- rbind(history, latest_history)
+  # Check if data for `year` is already in `history.csv`
+  history_year <- history |>
+    dplyr::filter(Year == year)
 
-  # MAYBE: add message if history != unique(history)
-  history <- unique(history)
+  has_year <- ifelse(nrow(history_year) > 0, TRUE, FALSE)
 
-  # rewrite the csv
-  readr::write_csv(history, "history.csv")
+  # use `menu()` to ask user if they want to overwrite it.
+  title <- paste0(
+    "'history.csv' already has entries for ",
+    year,
+    ". What would you like to do?"
+  )
+  if (has_year) {
+    choice <- utils::menu(
+      c("Overwrite them", "Stop without saving"),
+      title = title
+    )
+
+    if (choice == 1) {
+      # Overwrite (filter old year then add latest year entries)
+      history <- history |>
+        dplyr::filter(Year != year) |>
+        dplyr::bind_rows(latest_history)
+
+      readr::write_csv(history, "history.csv")
+      message(paste("History for", year, "has been overwritten."))
+    } else {
+      # Choice is 'stop' or 'exit'
+      stop(paste("History for", year, "has not been overwritten."))
+    }
+  } else {
+    # year not already in data set
+    history <- rbind(history, latest_history)
+    readr::write_csv(history, "history.csv")
+  }
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
