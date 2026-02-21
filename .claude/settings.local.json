@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/u2175871/Library/CloudStorage/OneDrive-UniversityofWarwick/Projects/Others/norman log --oneline -20)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
