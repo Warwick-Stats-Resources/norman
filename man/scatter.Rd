@@ -12,6 +12,8 @@ scatter(module_code, marks_matrix, student_overall_median, has_groups)
 \item{marks_matrix}{Numeric, the matrix of marks}
 
 \item{student_overall_median}{The row medians of marks_matrix}
+
+\item{has_groups}{Logical. Will be true if both `student_course.csv` and `course_mappings.csv` exist in the working folder.}
 }
 \value{
 A \code{ggplot} object

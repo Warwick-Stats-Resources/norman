@@ -6,9 +6,6 @@
 \usage{
 save_history()
 }
-\arguments{
-\item{year}{The year}
-}
 \description{
 If a "history.csv" file exists, adds the eight-number summary and module
 effect to that file, one row per module.
@@ -31,6 +28,6 @@ history.csv must have the following columns:
 }
 \examples{
 \dontrun{
-norman::save_history(2025)
+norman::save_history()
 }
 }
