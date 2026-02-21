@@ -1,12 +1,13 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.git.*$
-^\.Rhistory
+^\.Rhistoryd
 docs
 ^doc$
 ^Meta$
 .travis.yml
 CLAUDE.md
+.claude
 
 ^_pkgdown\.yml$
 ^docs$
