@@ -22,6 +22,11 @@ scatter(module_code, marks_matrix, student_overall_median, has_groups)
 
   The row medians of marks_matrix
 
+- has_groups:
+
+  Logical. Will be true if both \`student_course.csv\` and
+  \`course_mappings.csv\` exist in the working folder.
+
 ## Value
 
 A `ggplot` object

@@ -38,6 +38,12 @@ Because David needed a memorable name for this package. And because
 - [`get_module_effects()`](https://warwick-stats-resources.github.io/norman/reference/get_module_effects.md)
   : Print and return a table of module effects
 
+- [`history_boxplot()`](https://warwick-stats-resources.github.io/norman/reference/history_boxplot.md)
+  : Boxplots of recent marks data
+
+- [`history_effects()`](https://warwick-stats-resources.github.io/norman/reference/history_effects.md)
+  : Line graph of recent module effects
+
 - [`list_all_median_differences()`](https://warwick-stats-resources.github.io/norman/reference/list_all_median_differences.md)
   : List all median within-student differences between modules
 
@@ -55,6 +61,10 @@ Because David needed a memorable name for this package. And because
 
   A version of `meddiff` to compute median differences in a different
   format
+
+- [`n_recent_years()`](https://warwick-stats-resources.github.io/norman/reference/n_recent_years.md)
+  : Get the most recent years of data Assumes the df being filtered was
+  created by \`save_history()\`
 
 - [`print_file_listing()`](https://warwick-stats-resources.github.io/norman/reference/print_file_listing.md)
   : Print and return the list of files in a folder

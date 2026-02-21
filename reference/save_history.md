@@ -10,12 +10,6 @@ exist, creates the file first.
 save_history()
 ```
 
-## Arguments
-
-- year:
-
-  The year
-
 ## Details
 
 history.csv must have the following columns:
@@ -27,6 +21,6 @@ Max. - Mean, - S.D.
 
 ``` r
 if (FALSE) { # \dontrun{
-norman::save_history(2025)
+norman::save_history()
 } # }
 ```

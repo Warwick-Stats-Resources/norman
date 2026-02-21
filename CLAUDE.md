@@ -264,15 +264,17 @@ statistics:
 If historical data exists for the module in `history.csv`, an additional
 landscape page is created showing:
 
-- `history_boxplot()` displaying mark distributions for up to the 5 most
-  recent years
-- `history_effects()` showing the trend of module effects over time
+- [`history_boxplot()`](https://warwick-stats-resources.github.io/norman/reference/history_boxplot.md)
+  displaying mark distributions for up to the 5 most recent years
+- [`history_effects()`](https://warwick-stats-resources.github.io/norman/reference/history_effects.md)
+  showing the trend of module effects over time
 
 These history visualizations are positioned side-by-side on the page
 using `\vspace` positioning, with the boxplot on the left and the
 effects plot on the right. The system filters the module-specific
-history using `n_recent_years()` to focus on the 5 most recent years of
-data.
+history using
+[`n_recent_years()`](https://warwick-stats-resources.github.io/norman/reference/n_recent_years.md)
+to focus on the 5 most recent years of data.
 
 ### 6. Document Assembly and Rendering
 
