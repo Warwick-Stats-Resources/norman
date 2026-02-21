@@ -198,6 +198,7 @@ stemleaf <- function(module_code, module_marks) {
 #' @param module_code Character; the length-5 module code
 #' @param marks_matrix Numeric, the matrix of marks
 #' @param student_overall_median The row medians of marks_matrix
+#' @param has_groups Logical. Will be true if both `student_course.csv` and `course_mappings.csv` exist in the working folder.
 #' @return A \code{ggplot} object
 #'
 #' @import ggplot2
@@ -545,11 +546,9 @@ meddiff_fit <- function(m) {
 #' - Mean,
 #' - S.D.
 #'
-#' @param year The year
-#'
 #' @examples
 #' \dontrun{
-#' norman::save_history(2025)
+#' norman::save_history()
 #' }
 #' @export
 save_history <- function() {
@@ -698,14 +697,25 @@ save_history <- function() {
   }
 }
 
-# Get the n most recent years of data
-# Assumes the df being filtered was created by `save_history()`
+#' Get the most recent years of data
+#' Assumes the df being filtered was created by `save_history()`
+#'
+#' @param history A data frame containing marks history, as created by [norman::save_history()].
+#' @param n integer - the number of most recent years
 #' @export
-n_recent_years <- function(history, n) {
+n_recent_years <- function(history, n = 5) {
   history |>
     dplyr::filter(dplyr::dense_rank(dplyr::desc(Year)) <= n)
 }
 
+#' Boxplots of recent marks data
+#'
+#' These are based on summary statistics from the `history.csv` file in the working folder (if there is one),
+#' filtered on the five most recent years. Note that because there are based on the minimum, maximum, and quartiles of the marks data,
+#' rather than the raw marks, outliers aren't shown.
+#'
+#' @seealso [norman::n_recent_years()], [norman::save_history()]
+#' @inheritParams n_recent_years
 #' @export
 history_boxplot <- function(history) {
   ggplot(history, aes(x = Year, group = Year)) +
@@ -722,6 +732,13 @@ history_boxplot <- function(history) {
     labs(title = "Mark distribution by year, from summary statistics")
 }
 
+#' Line graph of recent module effects
+#'
+#' Created from the module effects saved in `history.csv`
+#'
+#' @inheritParams n_recent_years
+#'
+#' @seealso [norman::n_recent_years()], [norman::save_history()]
 #' @export
 history_effects <- function(history) {
   ggplot(history, aes(x = Year, y = Effect)) +
