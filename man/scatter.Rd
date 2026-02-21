@@ -4,7 +4,7 @@
 \alias{scatter}
 \title{Make a module-specific scatterplot}
 \usage{
-scatter(module_code, marks_matrix, student_overall_median)
+scatter(module_code, marks_matrix, student_overall_median, has_groups)
 }
 \arguments{
 \item{module_code}{Character; the length-5 module code}

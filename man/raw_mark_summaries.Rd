@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{raw_mark_summaries}
 \alias{raw_mark_summaries}
-\title{Make a matrix of 7-number summaries for all modules}
+\title{Make a matrix of 8-number summaries for all modules}
 \usage{
 raw_mark_summaries(marks_matrix)
 }
@@ -13,5 +13,5 @@ raw_mark_summaries(marks_matrix)
 A matrix
 }
 \description{
-Make a matrix of 7-number summaries for all modules
+Make a matrix of 8-number summaries for all modules
 }
