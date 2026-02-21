@@ -203,34 +203,56 @@ stemleaf <- function(module_code, module_marks) {
 #' @import ggplot2
 #'
 #' @export
-scatter <- function(module_code, marks_matrix, student_overall_median) {
-  options(warn = -1)
-  final_years_exams <- "ST903" %in% colnames(marks_matrix)
-  if (final_years_exams) {
-    ST903 <- !is.na(marks_matrix[, "ST903"])
-    ST952 <- !is.na(marks_matrix[, "ST952"])
-    ST415 <- !is.na(marks_matrix[, "ST415"])
-    ST404 <- !is.na(marks_matrix[, "ST404"])
-    group <- rep("BSc & other", nrow(marks_matrix))
-    group <- ifelse(ST903 & ST952, "MSc", group)
-    group <- ifelse(ST415, "M 4th yr", group)
-    group <- ifelse(ST404, "M 3rd yr", group)
-    group <- as.factor(group)
-    cbPalette <- c("#56B4E9", "#009E73", "#E0D442", "#CC79A7")
-    ##  For colourblind-friendly colours
-  }
-  module_mark <- marks_matrix[, module_code]
-  thegraph <- if (!final_years_exams) {
-    ggplot(, aes(y = module_mark, x = student_overall_median)) +
+scatter <- function(
+  module_code,
+  marks_matrix,
+  student_overall_median,
+  has_groups
+) {
+  plot_data <- dplyr::tibble(
+    ID = rownames(marks_matrix),
+    module_mark = marks_matrix[, module_code],
+    overall_median = student_overall_median
+  )
+
+  plot_data <- plot_data |>
+    dplyr::filter(!is.na(module_mark))
+
+  if (!has_groups) {
+    thegraph <- ggplot(
+      plot_data,
+      aes(y = module_mark, x = overall_median)
+    ) +
       geom_abline(slope = 1, intercept = 0, col = "grey") +
-      geom_point(colour = "#555555")
+      geom_point(color = "#555555")
   } else {
-    ggplot(, aes(y = module_mark, x = student_overall_median, color = group)) + ## shape = group ?
+    # Okabe Ito palette - colourblind-safe
+    cbPalette <- c(
+      "#56B4E9",
+      "#009E73",
+      "#E69F00",
+      "#CC79A7",
+      "#D55E00",
+      "#0072B2",
+      "#F0E442"
+    )
+
+    # student_course and course_mappings are in the environment
+    # when this function is called in module template
+    plot_data <- plot_data |>
+      dplyr::left_join(student_course, by = "ID") |>
+      dplyr::left_join(course_mappings, by = "Course")
+
+    thegraph <- ggplot(
+      plot_data,
+      aes(y = module_mark, x = overall_median, colour = Group)
+    ) +
       geom_abline(slope = 1, intercept = 0, col = "grey") +
       geom_point() +
       scale_colour_manual(values = cbPalette) +
       labs(color = "")
   }
+
   thegraph <- thegraph +
     theme(aspect.ratio = 1) +
     labs(x = "Median of ST modules taken this year", y = module_code) +
@@ -249,7 +271,7 @@ scatter <- function(module_code, marks_matrix, student_overall_median) {
   thegraph
 }
 
-#' Make a matrix of 7-number summaries for all modules
+#' Make a matrix of 8-number summaries for all modules
 #'
 #' @param marks_matrix The full matrix of marks for the modules
 #' @return A matrix
