@@ -67,7 +67,7 @@ cat("## module-code module-name History\n\n")
 ```
 
 ```{r eval=history_exists}
-module_history
+recent_history <- n_recent_years(module_history, n = 5)
 ```
 
 ```{r, results='asis', eval=history_exists}
