@@ -97,7 +97,7 @@ in that folder will be called **your current report**).
 
 ### All reports
 
-Your working folder must contain **the following five things**. (Other
+Your working folder must contain **the following three things**. (Other
 things can be there too, for example your own notes or whatever; but the
 software won’t work properly without the 3 things listed below.)
 

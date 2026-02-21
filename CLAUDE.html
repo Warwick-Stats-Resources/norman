@@ -178,11 +178,11 @@
 <div class="section level3">
 <h3 id="required-files">Required Files<a class="anchor" aria-label="anchor" href="#required-files"></a></h3>
 <p><strong><code>marks/</code> folder</strong>: Contains CSV files with module marks - Filenames: First 5 characters are used as the module code (e.g., <code>ST123_marks.csv</code> → module code “ST123”) - Required columns: <code>sprCode</code> (student identifier), <code>overallMark</code> (numeric mark)</p>
+<p><strong><code>module_names.csv</code></strong>: Maps module codes to human-readable names - Required columns: <code>ModuleCode</code>, <code>ModuleNames</code> (or similar) - Used throughout the report to display full module titles</p>
+<p><strong><code>modules_expected_here.txt</code></strong>: Lists expected module codes for validation - One module code per line - Used by <code><a href="reference/check_modules_expected.html">check_modules_expected()</a></code> to identify missing or unexpected modules</p>
 </div>
 <div class="section level3">
 <h3 id="optional-files">Optional Files<a class="anchor" aria-label="anchor" href="#optional-files"></a></h3>
-<p><strong><code>module_names.csv</code></strong>: Maps module codes to human-readable names - Required columns: <code>ModuleCode</code>, <code>ModuleNames</code> (or similar) - Used throughout the report to display full module titles</p>
-<p><strong><code>modules_expected_here.txt</code></strong>: Lists expected module codes for validation - One module code per line - Used by <code><a href="reference/check_modules_expected.html">check_modules_expected()</a></code> to identify missing or unexpected modules</p>
 <p><strong><code>year.txt</code></strong>: Contains the academic year for history tracking - Single line with a 4-digit year between 1000-2999 - Required for <code><a href="reference/save_history.html">save_history()</a></code> function</p>
 <p><strong><code>history.csv</code></strong>: Historical module statistics (created automatically by <code><a href="reference/save_history.html">save_history()</a></code>) - Columns: Year, Module, (N), Zeros, Min., 1st Qu., Median, 3rd Qu., Max., Mean, S.D., Effect - Enables longitudinal visualizations in module pages</p>
 <p><strong><code>student_course.csv</code></strong>: Maps students to course identifiers for grouping - Required columns: <code>ID</code> (character), <code>Course</code> (character) - Enables color-coded scatter plots when combined with <code>course_mappings.csv</code></p>

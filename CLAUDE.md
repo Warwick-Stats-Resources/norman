@@ -343,8 +343,6 @@ First 5 characters are used as the module code (e.g., `ST123_marks.csv`
 → module code “ST123”) - Required columns: `sprCode` (student
 identifier), `overallMark` (numeric mark)
 
-### Optional Files
-
 **`module_names.csv`**: Maps module codes to human-readable names -
 Required columns: `ModuleCode`, `ModuleNames` (or similar) - Used
 throughout the report to display full module titles
@@ -353,6 +351,8 @@ throughout the report to display full module titles
 validation - One module code per line - Used by
 [`check_modules_expected()`](https://warwick-stats-resources.github.io/norman/reference/check_modules_expected.md)
 to identify missing or unexpected modules
+
+### Optional Files
 
 **`year.txt`**: Contains the academic year for history tracking - Single
 line with a 4-digit year between 1000-2999 - Required for
