@@ -530,7 +530,23 @@ meddiff_fit <- function(m) {
 #' norman::save_history(2025)
 #' }
 #' @export
-save_history <- function(year) {
+save_history <- function() {
+  if (!file.exists("year.txt")) {
+    stop("Need a 'year.txt' file in the directory")
+  }
+
+  year <- readLines("year.txt")
+
+  if (length(year) != 1) {
+    stop("'year.txt' must contain a single year.")
+  }
+
+  if (!grepl("^[12]\\d{3}$", year)) {
+    stop("'year.txt' does not contain a single valid year (1000-2999)")
+  }
+
+  year <- as.numeric(year)
+
   # Declare global variables to satisfy R CMD check
   Year <- NULL
 
@@ -656,7 +672,15 @@ save_history <- function(year) {
     # year not already in data set
     history <- rbind(history, latest_history)
     readr::write_csv(history, "history.csv")
+    message(paste("History for", year, "has been written to 'history.csv'"))
   }
+}
+
+# Get the n most recent years of data
+# Assumes the df being filtered was created by `save_history()`
+n_recent_years <- function(history, n) {
+  history |>
+    dplyr::filter(dplyr::dense_rank(dplyr::desc(Year)) <= n)
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
