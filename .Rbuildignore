@@ -8,3 +8,7 @@ docs
 .travis.yml
 CLAUDE.md
 
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
