@@ -4,7 +4,7 @@
 \alias{save_history}
 \title{Save history}
 \usage{
-save_history(year)
+save_history()
 }
 \arguments{
 \item{year}{The year}

@@ -678,9 +678,26 @@ save_history <- function() {
 
 # Get the n most recent years of data
 # Assumes the df being filtered was created by `save_history()`
+#' @export
 n_recent_years <- function(history, n) {
   history |>
     dplyr::filter(dplyr::dense_rank(dplyr::desc(Year)) <= n)
+}
+
+#' @export
+history_boxplot <- function(history) {
+  ggplot(history, aes(x = Year, group = Year)) +
+    geom_boxplot(
+      aes(
+        ymin = `Min.`,
+        lower = `1st Qu.`,
+        middle = Median,
+        upper = `3rd Qu.`,
+        ymax = `Max.`
+      ),
+      stat = "identity"
+    ) +
+    labs(title = "Mark distribution by year, from summary statistics")
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
