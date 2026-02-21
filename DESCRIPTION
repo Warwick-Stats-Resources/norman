@@ -21,4 +21,3 @@ Encoding: UTF-8
 LazyData: false
 VignetteBuilder: knitr
 RoxygenNote: 7.3.3.9000
-URL: https://warwick-stats-resources.github.io/norman/
