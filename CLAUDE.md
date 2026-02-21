@@ -176,8 +176,6 @@ The norman package expects the following file structure in the working directory
 - Filenames: First 5 characters are used as the module code (e.g., `ST123_marks.csv` → module code "ST123")
 - Required columns: `sprCode` (student identifier), `overallMark` (numeric mark)
 
-### Optional Files
-
 **`module_names.csv`**: Maps module codes to human-readable names
 - Required columns: `ModuleCode`, `ModuleNames` (or similar)
 - Used throughout the report to display full module titles
@@ -185,6 +183,8 @@ The norman package expects the following file structure in the working directory
 **`modules_expected_here.txt`**: Lists expected module codes for validation
 - One module code per line
 - Used by `check_modules_expected()` to identify missing or unexpected modules
+
+### Optional Files
 
 **`year.txt`**: Contains the academic year for history tracking
 - Single line with a 4-digit year between 1000-2999
