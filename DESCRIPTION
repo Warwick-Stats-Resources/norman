@@ -10,8 +10,10 @@ Imports:
     ggplot2,
     readr,
     dplyr,
-    scales
-Suggests: rmarkdown, knitr, remotes
+    scales,
+    knitr,
+    remotes
+Suggests: rmarkdown
 License: file LICENSE
 Encoding: UTF-8
 LazyData: false
