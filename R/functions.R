@@ -700,6 +700,18 @@ history_boxplot <- function(history) {
     labs(title = "Mark distribution by year, from summary statistics")
 }
 
+#' @export
+history_effects <- function(history) {
+  ggplot(history, aes(x = Year, y = Effect)) +
+    geom_line() +
+    geom_point() +
+    scale_x_continuous(
+      breaks = scales::breaks_width(1),
+      labels = scales::label_number(big.mark = "")
+    ) +
+    labs(title = "History of module effects")
+}
+
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
 #'
 #' @param build_opts Character; options for \code{R CMD build}.  Default is \code{"--no-build-vignettes"}.

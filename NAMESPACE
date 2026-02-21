@@ -3,6 +3,7 @@
 export(check_modules_expected)
 export(get_module_effects)
 export(history_boxplot)
+export(history_effects)
 export(list_all_median_differences)
 export(make_module_pages)
 export(meddiff)

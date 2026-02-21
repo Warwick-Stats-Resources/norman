@@ -75,7 +75,7 @@ recent_history <- norman::n_recent_years(module_history, n = 5)
 cat("Note that only (up to) the 5 most recent years of history are displayed.\n\n")
 ```
 
-```{r eval=history_exists, fig.width=5, fig.height=7, out.height='5in', fig.align='left'}
+```{r eval=history_exists, fig.width=6, fig.height=7, out.height='5in', fig.align='left'}
 norman::history_boxplot(recent_history)
 ```
 
@@ -83,10 +83,10 @@ norman::history_boxplot(recent_history)
 cat("\\vspace{-5in}\n")
 ```
 
-```{r eval=history_exists, fig.width=5, fig.height=7, out.height='5in', fig.align='right'}
-# Keep as duplicate history_boxplot for now.
-# Will replace with different plot when implemented
-norman::history_boxplot(recent_history)
+
+
+```{r eval=history_exists, fig.width=6, fig.height=7, out.height='5in', fig.align='right'}
+norman::history_effects(recent_history)
 ```
 
 ```{r, results='asis', eval=history_exists}
