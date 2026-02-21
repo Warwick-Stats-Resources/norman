@@ -83,13 +83,16 @@ for a specific module’s marks, providing a compact visual representation
 of the distribution that preserves actual data values, useful for
 quickly identifying patterns and outliers.
 
-**`scatter(module_code, marks_matrix, student_overall_median)`** Creates
-a ggplot2 scatterplot comparing each student’s mark in a specific module
-against their overall median mark across all modules taken. Points above
-the diagonal line indicate better-than-expected performance; points
-below indicate worse-than-expected performance. For final year cohorts,
-the plot uses color coding to distinguish between degree program types
-(BSc, MSc, M 3rd year, M 4th year).
+**`scatter(module_code, marks_matrix, student_overall_median, has_groups)`**
+Creates a ggplot2 scatterplot comparing each student’s mark in a
+specific module against their overall median mark across all modules
+taken. Points above the diagonal line indicate better-than-expected
+performance; points below indicate worse-than-expected performance. When
+`has_groups = TRUE` and the optional grouping CSV files are present, the
+plot uses color coding with a colorblind-safe Okabe-Ito palette to
+distinguish between student groups as defined in `student_course.csv`
+and `course_mappings.csv`. When `has_groups = FALSE`, creates a simple
+grayscale scatterplot.
 
 ### Report Generation Functions
 
@@ -101,6 +104,42 @@ template using
 [`knitr::knit_child()`](https://rdrr.io/pkg/knitr/man/knit_child.html),
 and returns the compiled R Markdown content ready for inclusion in the
 final PDF document.
+
+### History Analysis Functions
+
+**`save_history(summaries, mdf, working_directory)`** Saves the
+eight-number summaries and module effects to a `history.csv` file for
+longitudinal tracking of module statistics across academic years. The
+function reads the current year from a `year.txt` file (which must
+contain a single line with a year between 1000-2999), creates the
+history file if it doesn’t exist, and appends new rows for each module
+with columns: Year, Module, (N), Zeros, Min., 1st Qu., Median, 3rd Qu.,
+Max., Mean, S.D., and Effect. If data for the current year already
+exists, the user is prompted via an interactive menu to choose whether
+to overwrite or cancel. This function enables tracking of module
+performance trends over time.
+
+**`n_recent_years(history, n)`** Filters a history dataframe to return
+only the `n` most recent years of data, using
+[`dplyr::dense_rank()`](https://dplyr.tidyverse.org/reference/row_number.html)
+to handle year ordering. This is useful for focusing visualizations on
+recent trends while maintaining access to the full historical record.
+
+**`history_boxplot(history)`** Creates a ggplot2 boxplot visualization
+showing the distribution of marks across years for a specific module.
+Uses the five-number summary statistics (Min., 1st Qu., Median, 3rd Qu.,
+Max.) from the history data to reconstruct boxplots for each year,
+providing a visual representation of how mark distributions have changed
+over time. The plot is titled “Mark distribution by year, from summary
+statistics”.
+
+**`history_effects(history)`** Creates a ggplot2 line plot showing the
+trend of module effects over time for a specific module. Uses
+[`scales::breaks_width()`](https://scales.r-lib.org/reference/breaks_width.html)
+to ensure appropriate year-based axis breaks. The plot is titled
+“History of module effects” and allows examination boards to identify
+whether a module’s relative difficulty has been stable or has changed
+systematically over time.
 
 ### Utility Functions
 
@@ -126,10 +165,19 @@ and
 [`print_file_listing()`](https://warwick-stats-resources.github.io/norman/reference/print_file_listing.md)
 to document the data sources, then reads all CSV files from the `marks/`
 subfolder, extracting `sprCode` (student identifier) and `overallMark`
-columns. These individual module mark files are consolidated into a
-single `marks_matrix` where rows represent students and columns
+columns. Module codes are determined by taking the first 5 characters of
+each CSV filename. These individual module mark files are consolidated
+into a single `marks_matrix` where rows represent students and columns
 represent modules, with `NA` values for module-student combinations
 where the student did not take that module.
+
+The system also checks for optional grouping files (`student_course.csv`
+and `course_mappings.csv`) which enable color-coded scatterplots by
+student group. If present, these files are validated to ensure correct
+column names: `student_course.csv` must have columns “ID” and “Course”,
+while `course_mappings.csv` must have columns “Course” and “Group”. The
+`has_groups` flag is set based on whether both files exist and pass
+validation.
 
 ### 2. Validation Phase
 
@@ -201,7 +249,8 @@ statistics:
 
 - [`scatter()`](https://warwick-stats-resources.github.io/norman/reference/scatter.md)
   creates a scatterplot showing how each student’s mark in this module
-  compares to their overall median performance
+  compares to their overall median performance, with optional
+  color-coding by student group
 - [`stemleaf()`](https://warwick-stats-resources.github.io/norman/reference/stemleaf.md)
   provides a stem-and-leaf display of the raw mark distribution
 - [`print_module_effect()`](https://warwick-stats-resources.github.io/norman/reference/print_module_effect.md)
@@ -211,6 +260,19 @@ statistics:
   and
   [`raw_mark_classes()`](https://warwick-stats-resources.github.io/norman/reference/raw_mark_classes.md)
   tables show this module’s statistics
+
+If historical data exists for the module in `history.csv`, an additional
+landscape page is created showing:
+
+- `history_boxplot()` displaying mark distributions for up to the 5 most
+  recent years
+- `history_effects()` showing the trend of module effects over time
+
+These history visualizations are positioned side-by-side on the page
+using `\vspace` positioning, with the boxplot on the left and the
+effects plot on the right. The system filters the module-specific
+history using `n_recent_years()` to focus on the 5 most recent years of
+data.
 
 ### 6. Document Assembly and Rendering
 
@@ -224,10 +286,24 @@ sequence, assembling:
 5.  Module effects analysis with rankings and Q-Q plot
 6.  Complete listing of median differences
 7.  Individual module pages (one per module in landscape)
+8.  For each module with history data: an additional landscape page with
+    historical visualizations
 
 The final `knit` operation converts this R Markdown document to PDF via
 LaTeX, producing a publication-ready report suitable for examination
 board meetings and scaling committee decisions.
+
+### 7. Post-Report History Tracking
+
+After generating a report, users can call
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
+to archive the current year’s statistics to `history.csv`. This function
+requires a `year.txt` file in the working directory containing the
+academic year. The accumulated history enables longitudinal analysis in
+future reports, allowing examination boards to monitor trends in module
+difficulty and mark distributions over multiple years. This supports
+evidence-based decisions about module design, assessment difficulty, and
+the stability of scaling adjustments.
 
 ### Design Philosophy
 
@@ -243,8 +319,58 @@ The package embodies several key design principles:
 - **Usability**: Template-based approach requires minimal R knowledge
   from users
 - **Auditability**: Validation checks catch common data errors early
+- **Flexibility**: External CSV-based grouping system allows
+  customization without code changes
+- **Longitudinal awareness**: History tracking enables trend analysis
+  across academic years
+- **Accessibility**: Colorblind-safe palettes ensure visualizations are
+  readable by all users
 
 This architecture enables statistics administrators to generate
 standardized, rigorous analytical reports with minimal manual
 intervention while maintaining full transparency into the methodology
 and underlying data.
+
+## Expected Data Files
+
+The norman package expects the following file structure in the working
+directory:
+
+### Required Files
+
+**`marks/` folder**: Contains CSV files with module marks - Filenames:
+First 5 characters are used as the module code (e.g., `ST123_marks.csv`
+→ module code “ST123”) - Required columns: `sprCode` (student
+identifier), `overallMark` (numeric mark)
+
+### Optional Files
+
+**`module_names.csv`**: Maps module codes to human-readable names -
+Required columns: `ModuleCode`, `ModuleNames` (or similar) - Used
+throughout the report to display full module titles
+
+**`modules_expected_here.txt`**: Lists expected module codes for
+validation - One module code per line - Used by
+[`check_modules_expected()`](https://warwick-stats-resources.github.io/norman/reference/check_modules_expected.md)
+to identify missing or unexpected modules
+
+**`year.txt`**: Contains the academic year for history tracking - Single
+line with a 4-digit year between 1000-2999 - Required for
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
+function
+
+**`history.csv`**: Historical module statistics (created automatically
+by
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)) -
+Columns: Year, Module, (N), Zeros, Min., 1st Qu., Median, 3rd Qu., Max.,
+Mean, S.D., Effect - Enables longitudinal visualizations in module pages
+
+**`student_course.csv`**: Maps students to course identifiers for
+grouping - Required columns: `ID` (character), `Course` (character) -
+Enables color-coded scatter plots when combined with
+`course_mappings.csv`
+
+**`course_mappings.csv`**: Maps course identifiers to display groups -
+Required columns: `Course` (character), `Group` (character) - Works with
+`student_course.csv` to enable group-based visualization - Uses
+colorblind-safe Okabe-Ito palette (supports up to 7 groups)

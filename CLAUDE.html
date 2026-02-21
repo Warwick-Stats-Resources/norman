@@ -63,11 +63,18 @@
 <div class="section level3">
 <h3 id="visualization-functions">Visualization Functions<a class="anchor" aria-label="anchor" href="#visualization-functions"></a></h3>
 <p><strong><code>stemleaf(module_code, module_marks)</code></strong> Generates a stem-and-leaf plot for a specific module’s marks, providing a compact visual representation of the distribution that preserves actual data values, useful for quickly identifying patterns and outliers.</p>
-<p><strong><code>scatter(module_code, marks_matrix, student_overall_median)</code></strong> Creates a ggplot2 scatterplot comparing each student’s mark in a specific module against their overall median mark across all modules taken. Points above the diagonal line indicate better-than-expected performance; points below indicate worse-than-expected performance. For final year cohorts, the plot uses color coding to distinguish between degree program types (BSc, MSc, M 3rd year, M 4th year).</p>
+<p><strong><code>scatter(module_code, marks_matrix, student_overall_median, has_groups)</code></strong> Creates a ggplot2 scatterplot comparing each student’s mark in a specific module against their overall median mark across all modules taken. Points above the diagonal line indicate better-than-expected performance; points below indicate worse-than-expected performance. When <code>has_groups = TRUE</code> and the optional grouping CSV files are present, the plot uses color coding with a colorblind-safe Okabe-Ito palette to distinguish between student groups as defined in <code>student_course.csv</code> and <code>course_mappings.csv</code>. When <code>has_groups = FALSE</code>, creates a simple grayscale scatterplot.</p>
 </div>
 <div class="section level3">
 <h3 id="report-generation-functions">Report Generation Functions<a class="anchor" aria-label="anchor" href="#report-generation-functions"></a></h3>
 <p><strong><code>make_module_pages(working_directory, module_codes, module_names, keep_tmpdir = FALSE)</code></strong> The master function that orchestrates individual module report generation. It reads a module-specific R Markdown template, customizes it for each module by substituting module codes and names, renders each template using <code><a href="https://rdrr.io/pkg/knitr/man/knit_child.html" class="external-link">knitr::knit_child()</a></code>, and returns the compiled R Markdown content ready for inclusion in the final PDF document.</p>
+</div>
+<div class="section level3">
+<h3 id="history-analysis-functions">History Analysis Functions<a class="anchor" aria-label="anchor" href="#history-analysis-functions"></a></h3>
+<p><strong><code>save_history(summaries, mdf, working_directory)</code></strong> Saves the eight-number summaries and module effects to a <code>history.csv</code> file for longitudinal tracking of module statistics across academic years. The function reads the current year from a <code>year.txt</code> file (which must contain a single line with a year between 1000-2999), creates the history file if it doesn’t exist, and appends new rows for each module with columns: Year, Module, (N), Zeros, Min., 1st Qu., Median, 3rd Qu., Max., Mean, S.D., and Effect. If data for the current year already exists, the user is prompted via an interactive menu to choose whether to overwrite or cancel. This function enables tracking of module performance trends over time.</p>
+<p><strong><code>n_recent_years(history, n)</code></strong> Filters a history dataframe to return only the <code>n</code> most recent years of data, using <code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">dplyr::dense_rank()</a></code> to handle year ordering. This is useful for focusing visualizations on recent trends while maintaining access to the full historical record.</p>
+<p><strong><code>history_boxplot(history)</code></strong> Creates a ggplot2 boxplot visualization showing the distribution of marks across years for a specific module. Uses the five-number summary statistics (Min., 1st Qu., Median, 3rd Qu., Max.) from the history data to reconstruct boxplots for each year, providing a visual representation of how mark distributions have changed over time. The plot is titled “Mark distribution by year, from summary statistics”.</p>
+<p><strong><code>history_effects(history)</code></strong> Creates a ggplot2 line plot showing the trend of module effects over time for a specific module. Uses <code><a href="https://scales.r-lib.org/reference/breaks_width.html" class="external-link">scales::breaks_width()</a></code> to ensure appropriate year-based axis breaks. The plot is titled “History of module effects” and allows examination boards to identify whether a module’s relative difficulty has been stable or has changed systematically over time.</p>
 </div>
 <div class="section level3">
 <h3 id="utility-functions">Utility Functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h3>
@@ -79,7 +86,8 @@
 <p>The norman package follows a structured workflow to transform raw CSV mark files into a comprehensive analytical report:</p>
 <div class="section level3">
 <h3 id="id_1-data-ingestion-phase">1. Data Ingestion Phase<a class="anchor" aria-label="anchor" href="#id_1-data-ingestion-phase"></a></h3>
-<p>The process begins when a user creates an R Markdown document from the norman template (<code>skeleton.Rmd</code>). This template references <code>report_body_material.Rmd</code>, which orchestrates the entire analysis. The system first calls <code><a href="reference/print_path.html">print_path()</a></code> and <code><a href="reference/print_file_listing.html">print_file_listing()</a></code> to document the data sources, then reads all CSV files from the <code>marks/</code> subfolder, extracting <code>sprCode</code> (student identifier) and <code>overallMark</code> columns. These individual module mark files are consolidated into a single <code>marks_matrix</code> where rows represent students and columns represent modules, with <code>NA</code> values for module-student combinations where the student did not take that module.</p>
+<p>The process begins when a user creates an R Markdown document from the norman template (<code>skeleton.Rmd</code>). This template references <code>report_body_material.Rmd</code>, which orchestrates the entire analysis. The system first calls <code><a href="reference/print_path.html">print_path()</a></code> and <code><a href="reference/print_file_listing.html">print_file_listing()</a></code> to document the data sources, then reads all CSV files from the <code>marks/</code> subfolder, extracting <code>sprCode</code> (student identifier) and <code>overallMark</code> columns. Module codes are determined by taking the first 5 characters of each CSV filename. These individual module mark files are consolidated into a single <code>marks_matrix</code> where rows represent students and columns represent modules, with <code>NA</code> values for module-student combinations where the student did not take that module.</p>
+<p>The system also checks for optional grouping files (<code>student_course.csv</code> and <code>course_mappings.csv</code>) which enable color-coded scatterplots by student group. If present, these files are validated to ensure correct column names: <code>student_course.csv</code> must have columns “ID” and “Course”, while <code>course_mappings.csv</code> must have columns “Course” and “Group”. The <code>has_groups</code> flag is set based on whether both files exist and pass validation.</p>
 </div>
 <div class="section level3">
 <h3 id="id_2-validation-phase">2. Validation Phase<a class="anchor" aria-label="anchor" href="#id_2-validation-phase"></a></h3>
@@ -110,13 +118,19 @@
 <li>Collects all rendered output into a single character vector</li>
 </ul><p>Each individual module page combines multiple visualizations and statistics:</p>
 <ul><li>
-<code><a href="reference/scatter.html">scatter()</a></code> creates a scatterplot showing how each student’s mark in this module compares to their overall median performance</li>
+<code><a href="reference/scatter.html">scatter()</a></code> creates a scatterplot showing how each student’s mark in this module compares to their overall median performance, with optional color-coding by student group</li>
 <li>
 <code><a href="reference/stemleaf.html">stemleaf()</a></code> provides a stem-and-leaf display of the raw mark distribution</li>
 <li>
 <code><a href="reference/print_module_effect.html">print_module_effect()</a></code> reports the fitted module effect in human-readable form</li>
 <li>Selected rows from the <code><a href="reference/raw_mark_summaries.html">raw_mark_summaries()</a></code> and <code><a href="reference/raw_mark_classes.html">raw_mark_classes()</a></code> tables show this module’s statistics</li>
-</ul></div>
+</ul><p>If historical data exists for the module in <code>history.csv</code>, an additional landscape page is created showing:</p>
+<ul><li>
+<code>history_boxplot()</code> displaying mark distributions for up to the 5 most recent years</li>
+<li>
+<code>history_effects()</code> showing the trend of module effects over time</li>
+</ul><p>These history visualizations are positioned side-by-side on the page using <code>\vspace</code> positioning, with the boxplot on the left and the effects plot on the right. The system filters the module-specific history using <code>n_recent_years()</code> to focus on the 5 most recent years of data.</p>
+</div>
 <div class="section level3">
 <h3 id="id_6-document-assembly-and-rendering">6. Document Assembly and Rendering<a class="anchor" aria-label="anchor" href="#id_6-document-assembly-and-rendering"></a></h3>
 <p>The main R Markdown document uses <code>knitr</code> to execute all code chunks in sequence, assembling:</p>
@@ -127,7 +141,12 @@
 <li>Module effects analysis with rankings and Q-Q plot</li>
 <li>Complete listing of median differences</li>
 <li>Individual module pages (one per module in landscape)</li>
+<li>For each module with history data: an additional landscape page with historical visualizations</li>
 </ol><p>The final <code>knit</code> operation converts this R Markdown document to PDF via LaTeX, producing a publication-ready report suitable for examination board meetings and scaling committee decisions.</p>
+</div>
+<div class="section level3">
+<h3 id="id_7-post-report-history-tracking">7. Post-Report History Tracking<a class="anchor" aria-label="anchor" href="#id_7-post-report-history-tracking"></a></h3>
+<p>After generating a report, users can call <code><a href="reference/save_history.html">save_history()</a></code> to archive the current year’s statistics to <code>history.csv</code>. This function requires a <code>year.txt</code> file in the working directory containing the academic year. The accumulated history enables longitudinal analysis in future reports, allowing examination boards to monitor trends in module difficulty and mark distributions over multiple years. This supports evidence-based decisions about module design, assessment difficulty, and the stability of scaling adjustments.</p>
 </div>
 <div class="section level3">
 <h3 id="design-philosophy">Design Philosophy<a class="anchor" aria-label="anchor" href="#design-philosophy"></a></h3>
@@ -144,7 +163,30 @@
 <strong>Usability</strong>: Template-based approach requires minimal R knowledge from users</li>
 <li>
 <strong>Auditability</strong>: Validation checks catch common data errors early</li>
+<li>
+<strong>Flexibility</strong>: External CSV-based grouping system allows customization without code changes</li>
+<li>
+<strong>Longitudinal awareness</strong>: History tracking enables trend analysis across academic years</li>
+<li>
+<strong>Accessibility</strong>: Colorblind-safe palettes ensure visualizations are readable by all users</li>
 </ul><p>This architecture enables statistics administrators to generate standardized, rigorous analytical reports with minimal manual intervention while maintaining full transparency into the methodology and underlying data.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="expected-data-files">Expected Data Files<a class="anchor" aria-label="anchor" href="#expected-data-files"></a></h2>
+<p>The norman package expects the following file structure in the working directory:</p>
+<div class="section level3">
+<h3 id="required-files">Required Files<a class="anchor" aria-label="anchor" href="#required-files"></a></h3>
+<p><strong><code>marks/</code> folder</strong>: Contains CSV files with module marks - Filenames: First 5 characters are used as the module code (e.g., <code>ST123_marks.csv</code> → module code “ST123”) - Required columns: <code>sprCode</code> (student identifier), <code>overallMark</code> (numeric mark)</p>
+</div>
+<div class="section level3">
+<h3 id="optional-files">Optional Files<a class="anchor" aria-label="anchor" href="#optional-files"></a></h3>
+<p><strong><code>module_names.csv</code></strong>: Maps module codes to human-readable names - Required columns: <code>ModuleCode</code>, <code>ModuleNames</code> (or similar) - Used throughout the report to display full module titles</p>
+<p><strong><code>modules_expected_here.txt</code></strong>: Lists expected module codes for validation - One module code per line - Used by <code><a href="reference/check_modules_expected.html">check_modules_expected()</a></code> to identify missing or unexpected modules</p>
+<p><strong><code>year.txt</code></strong>: Contains the academic year for history tracking - Single line with a 4-digit year between 1000-2999 - Required for <code><a href="reference/save_history.html">save_history()</a></code> function</p>
+<p><strong><code>history.csv</code></strong>: Historical module statistics (created automatically by <code><a href="reference/save_history.html">save_history()</a></code>) - Columns: Year, Module, (N), Zeros, Min., 1st Qu., Median, 3rd Qu., Max., Mean, S.D., Effect - Enables longitudinal visualizations in module pages</p>
+<p><strong><code>student_course.csv</code></strong>: Maps students to course identifiers for grouping - Required columns: <code>ID</code> (character), <code>Course</code> (character) - Enables color-coded scatter plots when combined with <code>course_mappings.csv</code></p>
+<p><strong><code>course_mappings.csv</code></strong>: Maps course identifiers to display groups - Required columns: <code>Course</code> (character), <code>Group</code> (character) - Works with <code>student_course.csv</code> to enable group-based visualization - Uses colorblind-safe Okabe-Ito palette (supports up to 7 groups)</p>
 </div>
 </div>
 </div>
