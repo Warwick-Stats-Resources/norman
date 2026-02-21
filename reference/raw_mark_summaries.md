@@ -1,6 +1,6 @@
-# Make a matrix of 7-number summaries for all modules
+# Make a matrix of 8-number summaries for all modules
 
-Make a matrix of 7-number summaries for all modules
+Make a matrix of 8-number summaries for all modules
 
 ## Usage
 

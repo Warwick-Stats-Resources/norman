@@ -41,7 +41,7 @@
   modules
 
 - [`raw_mark_summaries()`](https://warwick-stats-resources.github.io/norman/reference/raw_mark_summaries.md)
-  : Make a matrix of 7-number summaries for all modules
+  : Make a matrix of 8-number summaries for all modules
 
 - [`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
   : Save history

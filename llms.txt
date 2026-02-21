@@ -1,8 +1,5 @@
 # norman
 
-[![Build
-Status](https://travis-ci.org/DavidFirth/norman.svg?branch=master)](https://travis-ci.org/DavidFirth/norman)
-
 Special-purpose software for Warwick Statistics internal reports on
 module marks
 
@@ -20,13 +17,14 @@ the University of Warwick.
 **norman** is an *R* package, and there is a short document (a
 *vignette* in *R*) that gives instructions on how to install it and use
 it. The vignette can either be viewed in *R* (once the package has been
-installed!), or directly on the web at
-<https://davidfirth.github.io/norman/articles/instructions.html>
+installed!) by running `browseVignettes("norman")`, or directly on the
+web at
+<https://warwick-stats-resources.github.io/norman/articles/norman.html>
 
 ## Why “norman”?
 
-Because I needed a memorable name for this package. And because *nobody*
-was ever better at marking:
+Because David needed a memorable name for this package. And because
+*nobody* was ever better at marking:
 <https://en.wikipedia.org/wiki/Norman_Hunter_(footballer)>
 
 # Package index
@@ -72,7 +70,7 @@ was ever better at marking:
   modules
 
 - [`raw_mark_summaries()`](https://warwick-stats-resources.github.io/norman/reference/raw_mark_summaries.md)
-  : Make a matrix of 7-number summaries for all modules
+  : Make a matrix of 8-number summaries for all modules
 
 - [`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
   : Save history
@@ -94,4 +92,4 @@ was ever better at marking:
 ### All vignettes
 
 - [Making a Report on a Set of Module
-  Marks](https://warwick-stats-resources.github.io/norman/articles/instructions.md):
+  Marks](https://warwick-stats-resources.github.io/norman/articles/norman.md):

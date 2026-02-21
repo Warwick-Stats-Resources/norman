@@ -1,8 +1,5 @@
 # norman
 
-[![Build
-Status](https://travis-ci.org/DavidFirth/norman.svg?branch=master)](https://travis-ci.org/DavidFirth/norman)
-
 Special-purpose software for Warwick Statistics internal reports on
 module marks
 
@@ -20,11 +17,12 @@ the University of Warwick.
 **norman** is an *R* package, and there is a short document (a
 *vignette* in *R*) that gives instructions on how to install it and use
 it. The vignette can either be viewed in *R* (once the package has been
-installed!), or directly on the web at
-<https://davidfirth.github.io/norman/articles/instructions.html>
+installed!) by running `browseVignettes("norman")`, or directly on the
+web at
+<https://warwick-stats-resources.github.io/norman/articles/norman.html>
 
 ## Why “norman”?
 
-Because I needed a memorable name for this package. And because *nobody*
-was ever better at marking:
+Because David needed a memorable name for this package. And because
+*nobody* was ever better at marking:
 <https://en.wikipedia.org/wiki/Norman_Hunter_(footballer)>

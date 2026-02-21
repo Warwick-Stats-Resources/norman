@@ -5,7 +5,7 @@ Make a module-specific scatterplot
 ## Usage
 
 ``` r
-scatter(module_code, marks_matrix, student_overall_median)
+scatter(module_code, marks_matrix, student_overall_median, has_groups)
 ```
 
 ## Arguments
