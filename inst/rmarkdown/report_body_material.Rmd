@@ -75,7 +75,7 @@ Modules that were **found in the marks folder unexpectedly**:
 
 **Overall median mark: `r median(marks_matrix, na.rm = TRUE)`**
 
-## Seven-number summaries
+## Eight-number summaries
 
 ```{r summary_all_modules}
 summaries <- norman::raw_mark_summaries(marks_matrix)
@@ -107,7 +107,7 @@ For completeness, in case needed, the median differences from stage 1 are report
 **The result of this median-of-differences analysis is the following table of module effects.**  The effects are centred such that their median is zero.  Also reported in the table is the total number of within-student differences that were available to use in this analysis, for each module.
 
 
-```{r compute-median-differences, include = FALSE}
+```{r compute_median_differences, include = FALSE}
 md <- norman::meddiff(marks_matrix)  ## used as input to meddiff_fit()
 mdd <- norman::meddiff_for_display(marks_matrix)
 ## the latter is used only for the full listing of differences below
@@ -208,11 +208,11 @@ student_overall_median <- apply(marks_matrix, 1,
 \subsectionfont{\fontsize{14}{17}\selectfont}
   
 
-```{r make-module-pages, include = FALSE}
+```{r make_module_pages, include = FALSE}
 module_pages <- norman::make_module_pages(working_directory,
                                           module_codes, module_names)
 ```
 
-```{r print-module-pages, results="asis"}
+```{r print_module_pages, results="asis"}
 cat(module_pages, collapse = "\n")
 ```

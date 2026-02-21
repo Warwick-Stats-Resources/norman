@@ -10,6 +10,7 @@
 ```{r scatter-module-code, fig.width=5, fig.height=7, out.height='5in', fig.align='right'}
 norman::scatter("module-code", marks_matrix, student_overall_median)
 ```
+
 \vspace{-4.7in}
 \large
 
@@ -27,7 +28,7 @@ cat(stemplot, sep = "\n")
 \large
 \setlength{\LTleft}{1em}
 
-**Seven-number summary:**
+**Eight-number summary:**
 
 ```{r sevennum-module-code}
 knitr::kable(summaries["module-code",,drop = FALSE])
@@ -39,12 +40,60 @@ knitr::kable(summaries["module-code",,drop = FALSE])
 knitr::kable(classes["module-code (%)",,drop = FALSE])
 ```
 
+```{r}
+history_exists <- file.exists("../history.csv")
+```
 
+```{r eval=history_exists}
+library(dplyr)
+history <- readr::read_csv("../history.csv")
+module_history <- history |> 
+  filter(Module == "module-code")
 
+history_exists <- ifelse(nrow(module_history) > 0, TRUE, FALSE)
+```
 
+```{r, results='asis', eval=!history_exists}
+cat("There is no history for module-code.")
+```
 
 \vfill
 \elandscape
+
+```{r, results='asis', eval=history_exists}
+cat("\\newpage\n\n")
+cat("\\blandscape\n\n")
+cat("\\thispagestyle{mylandscape}\n\n")
+cat("## module-code module-name History\n\n")
+```
+
+```{r eval=history_exists}
+recent_history <- norman::n_recent_years(module_history, n = 5)
+```
+
+```{r, results='asis', eval=history_exists}
+cat("Note that only (up to) the 5 most recent years of history are displayed.\n\n")
+```
+
+```{r eval=history_exists, fig.width=6, fig.height=7, out.height='5in', fig.align='left'}
+norman::history_boxplot(recent_history)
+```
+
+```{r, results='asis', eval=history_exists}
+cat("\\vspace{-5in}\n")
+```
+
+
+
+```{r eval=history_exists, fig.width=6, fig.height=7, out.height='5in', fig.align='right'}
+norman::history_effects(recent_history)
+```
+
+```{r, results='asis', eval=history_exists}
+cat("\\vfill\n")
+cat("\\elandscape\n")
+```
+
 \newpage
 
 

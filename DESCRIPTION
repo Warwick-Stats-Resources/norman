@@ -1,15 +1,21 @@
 Package: norman
 Title: Package for Warwick Statistics module marks analysis 
-Version: 1.1.0
-Authors@R: person("David", "Firth", email = "d.firth@warwick.ac.uk", role = c("aut", "cre"))
-Author: David Firth [aut, cre]
-Maintainer: David Firth <d.firth@warwick.ac.uk>
+Version: 1.1.0.9025
+Authors@R: c(person("David", "Firth", email = "d.firth@warwick.ac.uk", role = c("aut")),
+    person("Ella", "Kaye", email = "ella.kaye@gmail.com", role = c("aut", "cre")))
 Description: This package provides a report template (.Rmd), and associated R functions that are called when that .Rmd file is knitted.
 Depends: R (>= 3.6.0)
-Imports: knitr, aplpack, ggplot2, remotes
+Imports: 
+    knitr,
+    aplpack,
+    ggplot2,
+    remotes,
+    readr,
+    dplyr,
+    scales
 Suggests: rmarkdown
 License: file LICENSE
 Encoding: UTF-8
 LazyData: false
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.3.3.9000

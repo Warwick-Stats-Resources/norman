@@ -260,11 +260,12 @@ scatter <- function(module_code, marks_matrix, student_overall_median) {
 #' @export
 raw_mark_summaries <- function(marks_matrix) {
   M <- ncol(marks_matrix)
-  result <- matrix(NA, M, 8)
+  result <- matrix(NA, M, 9)
   rownames(result) <- colnames(marks_matrix)
   colnames(result) <- c(
     "(N)",
     "Zeros",
+    "Min.",
     "1st Qu.",
     "Median",
     "3rd Qu.",
@@ -275,6 +276,9 @@ raw_mark_summaries <- function(marks_matrix) {
   result[, "(N)"] <- apply(marks_matrix, 2, function(col) sum(!is.na(col)))
   result[, "Zeros"] <- apply(marks_matrix, 2, function(col) {
     sum(col == 0, na.rm = TRUE)
+  })
+  result[, "Min."] <- apply(marks_matrix, 2, function(col) {
+    min(col, na.rm = TRUE)
   })
   result[, "1st Qu."] <- apply(marks_matrix, 2, function(col) {
     quantile(col, 0.25, na.rm = TRUE)
@@ -497,6 +501,215 @@ meddiff_fit <- function(m) {
   result <- lm(diffs ~ X - 1, weights = weights)
   result$coefficients[is.na(result$coefficients)] <- 0
   return(result)
+}
+
+#' Save history
+#'
+#' If a "history.csv" file exists, adds the eight-number summary and module
+#' effect to that file, one row per module.
+#' If "history.csv" does not exist, creates the file first.
+#'
+#' history.csv must have the following columns:
+#'
+#' - Year
+#' - Module
+#' - (N)
+#' - Zeros
+#' - Min.
+#' - 1st Qu.
+#' - Median
+#' - 3rd Qu.
+#' - Max.
+#' - Mean,
+#' - S.D.
+#'
+#' @param year The year
+#'
+#' @examples
+#' \dontrun{
+#' norman::save_history(2025)
+#' }
+#' @export
+save_history <- function() {
+  if (!file.exists("year.txt")) {
+    stop("Need a 'year.txt' file in the directory")
+  }
+
+  year <- readLines("year.txt")
+
+  if (length(year) != 1) {
+    stop("'year.txt' must contain a single year.")
+  }
+
+  if (!grepl("^[12]\\d{3}$", year)) {
+    stop("'year.txt' does not contain a single valid year (1000-2999)")
+  }
+
+  year <- as.numeric(year)
+
+  # Declare global variables to satisfy R CMD check
+  Year <- NULL
+
+  # create history.csv if it doesn't exist
+  history_colnames <- c(
+    "Year",
+    "Module",
+    "(N)",
+    "Zeros",
+    "Min.",
+    "1st Qu.",
+    "Median",
+    "3rd Qu.",
+    "Max.",
+    "Mean",
+    "S.D.",
+    "Effect"
+  )
+  if (!file.exists("history.csv")) {
+    history <- data.frame(matrix(ncol = 12, nrow = 0))
+    colnames(history) <- history_colnames
+    readr::write_csv(history, "history.csv")
+  }
+
+  # read and check colnames of "history"
+  history <- readr::read_csv("history.csv", show_col_type = FALSE)
+  if (!identical(colnames(history), history_colnames)) {
+    stop("`'history.csv'` does not have expected column names.")
+  }
+
+  ## Run the code from `report_body_material` (chunk names)
+  # Get filesnames (adapted from print_file_listing without the printing)
+  filenames <- list.files(path = "marks", pattern = "*.csv")
+
+  # read_in_the_marks
+  module_codes <- unlist(substr(filenames, 1, 5))
+  module_marks <- vector(mode = "list", length = length(module_codes))
+  for (i in seq(along = filenames)) {
+    module_marks[[module_codes[i]]] <-
+      utils::read.csv(
+        paste0("marks/", filenames[i]),
+        stringsAsFactors = TRUE
+      )[, c("sprCode", "overallMark")]
+  }
+  student_IDs <- sapply(module_marks, function(m) as.character(m[[1]]))
+  module_marks <- sapply(module_marks, function(m) (m[[2]]))
+  unique_student_IDs <- sort(unique(unlist(student_IDs)))
+  marks_matrix <- matrix(NA, length(unique_student_IDs), length(module_codes))
+  rownames(marks_matrix) <- unique_student_IDs
+  colnames(marks_matrix) <- module_codes
+  for (m in module_codes) {
+    marks_matrix[student_IDs[[m]], m] <- module_marks[[m]]
+  }
+
+  # create the eight-number summaries
+  summaries <- raw_mark_summaries(marks_matrix)
+
+  ## create the module effects
+  # compute_median_differences
+  md <- norman::meddiff(marks_matrix) ## used as input to meddiff_fit()
+  mdd <- norman::meddiff_for_display(marks_matrix)
+  ## the latter is used only for the full listing of differences below
+  mdfit <- norman::meddiff_fit(md)
+  rsq <- summary(mdfit)$r.squared
+
+  # get_module_effects
+  # this is taken from code within `get_module_effects`, up to preparing `mdf` for printing
+  # NOTE: probably want to extract into separate function to avoid code repetion
+  count <- numeric(length(mdd))
+  names(count) <- names(mdd)
+  for (i in names(mdd)) {
+    count[i] <- sum(mdd[[i]][2, ])
+  }
+  mdfit <- mdfit$coef
+  #names(mdfit) <- module_codes
+  #weighted_mean <- sum(mdfit * count) / sum(count)
+  #mdfit <- round(mdfit - weighted_mean, 1)
+  mdfit <- round(mdfit - median(mdfit), 1)
+  mdf <- data.frame(Effect = mdfit)
+
+  row.names(summaries) <- NULL
+  row.names(mdf) <- NULL
+
+  # combine
+  latest_history <- dplyr::bind_cols(
+    Year = year,
+    Module = module_codes,
+    summaries,
+    mdf
+  )
+
+  # Check if data for `year` is already in `history.csv`
+  history_year <- history |>
+    dplyr::filter(Year == year)
+
+  has_year <- ifelse(nrow(history_year) > 0, TRUE, FALSE)
+
+  # use `menu()` to ask user if they want to overwrite it.
+  title <- paste0(
+    "'history.csv' already has entries for ",
+    year,
+    ". What would you like to do?"
+  )
+  if (has_year) {
+    choice <- utils::menu(
+      c("Overwrite them", "Stop without saving"),
+      title = title
+    )
+
+    if (choice == 1) {
+      # Overwrite (filter old year then add latest year entries)
+      history <- history |>
+        dplyr::filter(Year != year) |>
+        dplyr::bind_rows(latest_history)
+
+      readr::write_csv(history, "history.csv")
+      message(paste("History for", year, "has been overwritten."))
+    } else {
+      # Choice is 'stop' or 'exit'
+      stop(paste("History for", year, "has not been overwritten."))
+    }
+  } else {
+    # year not already in data set
+    history <- rbind(history, latest_history)
+    readr::write_csv(history, "history.csv")
+    message(paste("History for", year, "has been written to 'history.csv'"))
+  }
+}
+
+# Get the n most recent years of data
+# Assumes the df being filtered was created by `save_history()`
+#' @export
+n_recent_years <- function(history, n) {
+  history |>
+    dplyr::filter(dplyr::dense_rank(dplyr::desc(Year)) <= n)
+}
+
+#' @export
+history_boxplot <- function(history) {
+  ggplot(history, aes(x = Year, group = Year)) +
+    geom_boxplot(
+      aes(
+        ymin = `Min.`,
+        lower = `1st Qu.`,
+        middle = Median,
+        upper = `3rd Qu.`,
+        ymax = `Max.`
+      ),
+      stat = "identity"
+    ) +
+    labs(title = "Mark distribution by year, from summary statistics")
+}
+
+#' @export
+history_effects <- function(history) {
+  ggplot(history, aes(x = Year, y = Effect)) +
+    geom_line() +
+    geom_point() +
+    scale_x_continuous(
+      breaks = scales::breaks_width(1),
+      labels = scales::label_number(big.mark = "")
+    ) +
+    labs(title = "History of module effects")
 }
 
 #' Update the \code{norman} package --- a wrapper for \code{remotes::install_github}
