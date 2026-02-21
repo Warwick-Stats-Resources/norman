@@ -2,7 +2,9 @@
 
 ## norman 1.1.0 (2020-05-04)
 
-- Fixed a bug in meddiff_fit (PR \#1, thanks to Ella Kaye)
+- Fixed a bug in meddiff_fit (PR
+  [\#1](https://github.com/warwick-stats-resources/norman/issues/1),
+  thanks to Ella Kaye)
 
 ## norman 1.0.9 (2020-04-30)
 

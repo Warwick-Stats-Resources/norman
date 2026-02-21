@@ -8,6 +8,9 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/warwick-stats-resources/norman/blob/main/DESCRIPTION)
+
 Firth D, Kaye E (2026). *norman: Package for Warwick Statistics module
 marks analysis*. R package version 1.1.0.9027,
 <https://warwick-stats-resources.github.io/norman/>.
