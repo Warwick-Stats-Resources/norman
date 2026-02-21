@@ -1,0 +1,242 @@
+# Making a Report on a Set of Module Marks
+
+Here are instructions for using the **norman** package, to generate a
+report (in PDF) on any given set of exam marks.
+
+This is **all** specific to the administration of courses in the
+Department of Statistics at the University of Warwick. It is of no
+conceivable interest to anyone else.
+
+I recommend reading the whole document before doing anything — to get
+the idea of how all this is meant to work.
+
+## 0. Setup your *RStudio* and *LaTeX* (if not done already)
+
+The instructions below (from step 1 onwards) will all assume that you
+have a functioning installation of *R*, *Rtools*, *RStudio* and *LaTeX*
+— specifically, a setup that is capable of “knitting” an *R Markdown*
+(`.Rmd`) file to a PDF output document. (A part of that setup with be
+the installation of the *R* add-on package **rmarkdown**.)
+
+These installations are all fairly standard. Our IT support staff should
+be able to handle it without problem.
+
+It’s probably best to test your setup on a relatively *simple* R
+Markdown document, such as the one you get when selecting **File –\> New
+file –\> R markdown** in Rstudio’s menu. With such a file open in the
+*RStudio* editor, try doing **Knit to PDF** (from the “Knit” menu).
+
+In Windows, setting up these things seems sometimes to be problematic, I
+don’t know why. But there are plenty of tips available online (e.g.,
+<https://rickpackblog.wordpress.com/2017/10/04/miktex-install-for-r-windows-pdf-output-r-markdown/>
+). Good luck with it! Thankfully you’ll only need to do it once — until
+you get a new computer, of course.
+
+## 0.5. Add the **norman** package to your *R* installation
+
+### 0.5.1 Installing **norman**
+
+The package **norman** builds Warwick Statistics reports on exam marks.
+
+To install **norman** for the first time: in your *R* Console (which is
+one of the panes in the *RStudio* window), paste the following and hit
+return:
+
+    if (!("remotes" %in% installed.packages()[,"Package"])) install.packages("remotes")
+    remotes::install_github("DavidFirth/norman", build_opts = "--no-build-vignettes")
+
+The installation of **norman** should also trigger the installation of 2
+other packages if you do not have them already. They are **aplpack** and
+**ggplot2**.
+
+### 0.5.2 Installing **rmarkdown** (if you have not done it already in step 0)
+
+Again in your *R* console:
+
+    install.packages("rmarkdown")
+
+### 0.5.9 *Updating* **norman**
+
+This will be needed only later, whenever the **norman** package itself
+has been updated to a new version — for example, after **norman** has
+been improved to fix bugs or to add new features to the reports it
+makes. If you have only just installed **norman** (as detailed above),
+you should *skip this section for now but keep it in mind for when
+needed.*
+
+Whenever you *do* find the need to update **norman**, in your *R*
+console just issue the following command:
+
+    norman::update()
+
+## 1. Make a separate folder for each report that you will prepare (if not made already)
+
+In 2019 for example, you might want to have folders named something like
+
+- *2019_Second_Year_marks_before_scaling*
+- *2019_Second_Year_marks_after_scaling*
+- *2019_Finals_and_MSc_marks_before_scaling*
+- *2019_Finals_and_MSc_marks_after_scaling*
+
+— but the names can be chosen freely, depending on your specific filing
+needs. The name of each folder should indicate clearly *which marks*
+will be used in making the corresponding report.
+
+You can have as many of these folders as you want — it just needs to be
+*one folder for each report that you want to make*. Each folder will be
+a separate “project” (in the terminology of *RStudio*).
+
+## 2. Decide which report you want to make first (or next)
+
+This determines *which* of the folders you made will be the one that you
+will be working in next. That folder will be called **your current
+working folder** in what follows (and the report that you want to make
+in that folder will be called **your current report**).
+
+## 3. The data requirements for making one report
+
+Your working folder must contain **the following five things**. (Other
+things can be there too, for example your own notes or whatever; but the
+software won’t work properly without the 3 things listed below.)
+
+### 3a. A subfolder containing the mark sheets
+
+The most essential input to this report-building package is a subfolder
+containing exam marks.
+
+The subfolder should be named simply as `marks`. If you give it any
+other name, the software will not work. (This is deliberate.)
+
+The folder can contain any number of comma-separated-values (`.csv`)
+files. Each such file must have a name that starts with the 5-character
+code for a module, for example `ST344_raw_marks_2019.csv`. The rest of
+each file name (after the first 5 characters, before `.csv`) can be
+anything, within reason.
+
+Each of the `.csv` files must contain *at least* columns named `sprCode`
+and `overallMark` — these being the columns that identify students, and
+give each student’s mark in the module. Any other columns present in the
+`.csv` files will simply be ignored.
+
+### 3b. A sheet of module names
+
+This must be a comma-separated-values file named `module_names.csv` file
+with 2 columns, headed `ModuleCode` and `ModuleName`.
+
+This file *must* provide a module name for (at least) each module code
+that will be found in the `marks` folder for the current report.
+(Different `module_names.csv` files can be used in different reports, if
+needed.)
+
+(The `module_names.csv` file *can* safely contain also module
+codes/names that are not relevant to your current report — they will
+simply be ignored.)
+
+### 3c. A list of the modules that are expected to be found in the marks folder for this report
+
+This must be a simple, plain text file named `modules_expected_here.txt`
+(a file made, for example, with *Notepad+*). It should contain one
+5-character module code on each line.
+
+The modules listed in this file should be all the ones that are relevant
+to your current report.
+
+This file is used only for *checking* purposes, to provide a warning if
+either
+
+- the marks folder contains some modules that were not expected
+- some modules that *were* expected are missing from the marks folder.
+
+### 3d. A file linking each student with their course
+
+**SAY MORE HERE**
+
+### 3e. A file linking course codes with the groupings for the scatter plots
+
+**SAY MORE HERE**
+
+Your working folder may also contain **the following two things**, to
+work with the \[save_history()\] function.
+
+### 3f. A file with the year
+
+THis must be called `year.txt` and contain exactly one line of text,
+with the 4-digit year of exam marks in the `marks` folder, e.g. 2025.
+
+### 3g. A file with the marks history
+
+This file must be called `history.csv`.
+
+A `history.csv` file will be created the first time you call
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md),
+with the 8-number summary and module effects for the year in `year.txt`.
+If you call
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
+again in the same year, you will have the option to either overwrite the
+currently saved data or not.
+
+This `history.csv` file should be copied into the RStudio projects for
+future years. Then, when
+[`save_history()`](https://warwick-stats-resources.github.io/norman/reference/save_history.md)
+is called in that yearm the data will be appended.
+
+No data will be deleted from `history.csv`, but only the most recent
+five years will be shown on the history pages of the report.
+
+**SAY MORE ABOUT THE HEADERS IN THE DATA FRAME**.
+
+## 4. Start up RStudio and make a new RStudio project (if not made already)
+
+From the **File** menu in *RStudio*, pick **New Project** and then
+**Existing Directory**. Then browse to your current working folder and
+click **Create Project**.
+
+## 5. Make a new R Markdown document for your current report
+
+Still in *RStudio*: **File -\> New File -\> R Markdown -\> From
+Template**, then from the menu pick the item **Warwick Stats report on
+module marks**.
+
+This will open up a template `.Rmd` file for editing.
+
+In that template there are 3 places labelled **????** where you will
+want to make appropriate edits. (The edits can be done at a later time,
+if you want to see your report first.) These edits will provide:
+
+- the **title** of your report
+- the **author** of the report (i.e., who it was prepared by)
+- any **remarks** that you might want to appear at the top of the report
+  (for example, about the report’s status, about any data that’s
+  missing, or whatever else you might want to note there).
+
+When you have finished editing those 3 things, or if you have decided to
+postpone that editing until later, pick **File -\> Save as…** and save
+your `.Rmd` file into your current working folder, with a name that will
+clearly identify your report. (For example,
+`2019_Second_year_marks_report_before_scaling.Rmd` — or whatever you
+want, but it must have the file extension `.Rmd`.)
+
+## 6. Make the report
+
+Just click on **Knit** at the top of your *RStudio* window.
+
+If all goes well, this will make your report as a PDF document in your
+current working folder (with the same name as your `.Rmd` file, but with
+the `.pdf` extension replacing `.Rmd`).
+
+## 7. Re-making a report after some of the data has changed, or after you have made edits
+
+When the data has changed (for whatever reason), or when you want to
+make fresh edits to the title, author or remarks fields of the report,
+you can update your report just by opening the `.Rmd` file (in
+*RStudio*). Make any necessary edits and then click **Knit** to save the
+report and re-make the PDF document.
+
+Note that this will **over-write** your previous report. So if you want
+to keep the previous PDF, you should re-name it first, before updating
+the report as described above.
+
+## 8. Problems?
+
+Ask David Firth for advice, if any of the above is unclear or does not
+work.
