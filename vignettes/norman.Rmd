@@ -42,16 +42,16 @@ The package **norman** builds Warwick Statistics reports on exam marks.
 To install **norman** for the first time: in your _R_ Console (which is one of the panes in the _RStudio_ window), paste the following and hit return:
 ```
 if (!("remotes" %in% installed.packages()[,"Package"])) install.packages("remotes")
-remotes::install_github("DavidFirth/norman", build_opts = "--no-build-vignettes")
+remotes::install_github("Warwick-Stats-Resources/norman", build_vignettes = TRUE)
 ```
 
-The installation of **norman** should also trigger the installation of 2 other 
-packages if you do not have them already.  They are **aplpack** 
-and **ggplot2**.
+The installation of **norman** should also trigger the installation of five other 
+packages if you do not have them already.  They are **aplpack**, **ggplot2**, **dplyr**, **readr**, and **scales**.
 
 ## 0.5.2 Installing **rmarkdown** (if you have not done it already in step 0)
 
 Again in your _R_ console:
+
 ```
 install.packages("rmarkdown")
 ```
@@ -86,17 +86,17 @@ In 2019 for example, you might want to have folders named something like
 You can have as many of these folders as you want --- it just needs to be _one folder 
 for each report that you want to make_.  Each folder will be a separate "project" (in the terminology of _RStudio_).
 
-
 # 2.  Decide which report you want to make first (or next)
 
 This determines _which_ of the folders you made will be the one that you will be working in next.  That folder will be called **your current working folder** in what follows (and the report that you want to make in that folder will be called **your current report**).
 
-
 # 3.  The data requirements for making one report
+
+## All reports
 
 Your working folder must contain **the following five things**.  (Other things can be there too, for example your own notes or whatever; but the software won't work properly without the 3 things listed below.)
 
-## 3a. A subfolder containing the mark sheets
+### 3a. A subfolder containing the mark sheets
 
 The most essential input to this report-building package is a subfolder containing exam marks.
 
@@ -108,7 +108,7 @@ The rest of each file name (after the first 5 characters, before `.csv`) can be 
 Each of the `.csv` files must contain _at least_ columns named `sprCode` and `overallMark` --- these
 being the columns that identify students, and give each student's mark in the module.  Any other columns present in the `.csv` files will simply be ignored.
 
-## 3b. A sheet of module names
+### 3b. A sheet of module names
 
 This must be a comma-separated-values file named `module_names.csv` file with 2 columns, headed `ModuleCode` and `ModuleName`.  
 
@@ -116,7 +116,7 @@ This file _must_ provide a module name for (at least) each module code that will
 
 (The `module_names.csv` file _can_ safely contain also module codes/names that are not relevant to your current report --- they will simply be ignored.) 
 
-## 3c. A list of the modules that are expected to be found in the marks folder for this report
+### 3c. A list of the modules that are expected to be found in the marks folder for this report
 
 This must be a simple, plain text file named `modules_expected_here.txt` (a file made, for example, with _Notepad+_).  It should contain one 5-character module code on each line.  
 
@@ -127,34 +127,42 @@ This file is used only for _checking_ purposes, to provide a warning if either
 - the marks folder contains some modules that were not expected
 - some modules that _were_ expected are missing from the marks folder.
 
-## 3d. A file linking each student with their course 
+## For reports where students are grouped in the scatter plots (e.g.. final year reports)
 
-**SAY MORE HERE**
+If a grouping is desired for the scatter plots on the module pages, the following **two files** must **both** be in the working folder.
 
-## 3e. A file linking course codes with the groupings for the scatter plots
+### 3d. A file linking each student with their course 
 
-**SAY MORE HERE**
+This must be a file named `student_course.csv`, with two columns, `ID` and `Course`.
 
-Your working folder may also contain **the following two things**, to work with the [save_history()] function.
+`ID` is the 7-digit student ID number. `Course` is their course code, e.g. "USTA-G302".
 
-## 3f. A file with the year
+### 3e. A file linking course codes with the groupings for the scatter plots
 
-THis must be called `year.txt` and contain exactly one line of text, with the 4-digit year of exam marks in the `marks` folder, e.g. 2025.
+This must be a file named `course_mappings.csv`, with two columns, `Course` and `Group`.
 
-## 3g. A file with the marks history
+`Course` is a course code, e.g. "USTA-G302". There should be one course code for each (unique) `Course` in `student_course.csv`. `Group` is whatever grouping is needed for the scatter plots of module marks against the median of ST modules taken, as it appears on each individual module page of the report. This will likely be degree types, e.g. "BSc", "IM".
+
+## For saving history
+
+If you wish to save the marks summaries and module effects with the [save_history()] function, the working folder *must* contain a file with the year and *may* already contain the history.
+Note that neither of these files are needed to knit the report.
+
+### 3f. A file with the year
+
+This must be called `year.txt` and contain exactly one line of text, with the 4-digit year of exam marks in the `marks` folder, e.g. 2025.
+
+### 3g. A file with the marks history
 
 This file must be called `history.csv`.
 
-A `history.csv` file will be created the first time you call `save_history()`, with the 8-number summary and module effects for the year in `year.txt`.
+If there is no file called `history.csv` in the working folder, a `history.csv` file will be created the first time you call `save_history()`, with the 8-number summary and module effects for the year in `year.txt`.
 If you call `save_history()` again in the same year, you will have the option to either overwrite the currently saved data or not.
 
 This `history.csv` file should be copied into the RStudio projects for future years. 
-Then, when `save_history()` is called in that yearm the data will be appended.
+Then, when `save_history()` is called in that year, the data will be appended.
 
 No data will be deleted from `history.csv`, but only the most recent five years will be shown on the history pages of the report.
-
-**SAY MORE ABOUT THE HEADERS IN THE DATA FRAME**.
-
 
 # 4.  Start up RStudio and make a new RStudio project (if not made already)
 
@@ -189,7 +197,17 @@ When the data has changed (for whatever reason), or when you want to make fresh 
 
 Note that this will **over-write** your previous report.  So if you want to keep the previous PDF, you should re-name it first, before updating the report as described above.
 
-# 8.  Problems?
+# 8. Save the module summaries and effects
 
-Ask David Firth for advice, if any of the above is unclear or does not work.
+Check there is a `year.txt` file in the working folder (see point 3f above) and (optionally) a `history.csv` file (see point 3g).
+
+In the RStudio console, run:
+
+```
+norman::save_history()
+```
+
+# 9.  Problems?
+
+Ask Jon Forster, Ella Kaye or David Firth for advice (in that order!), if any of the above is unclear or does not work.
 
