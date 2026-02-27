@@ -767,5 +767,5 @@ history_effects <- function(history) {
 #' @export
 #'
 update <- function(build_opts = "--no-build-vignettes", ...) {
-  install_github("DavidFirth/norman", build_opts = build_opts, ...)
+  install_github("Warwick-Stats-Resources/norman", build_opts = build_opts, ...)
 }
